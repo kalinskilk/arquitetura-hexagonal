@@ -10,6 +10,8 @@ RUN go get -u github.com/spf13/cobra@latest && \
 
 RUN apt-get update && apt-get install sqlite3 -y
 
+RUN apt-get update && apt-get install -y gcc libc6-dev
+
 RUN usermod -u 1000 www-data
 RUN mkdir -p /var/www/.cache
 RUN chown -R www-data:www-data /go

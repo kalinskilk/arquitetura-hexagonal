@@ -1,14 +1,18 @@
-package db
+package db_test
 
 import (
 	"database/sql"
 	"log"
+	"testing"
+
+	"github.com/kalinskilk/arquitetura-hexagonal/adapters/db"
+	"github.com/stretchr/testify/require"
 )
 
 var Db *sql.DB
 
 func setup() {
-	Db, _ = sql.Open("sqlite3", ":memory:")
+	Db, _ = sql.Open("sqlite", ":memory:")
 	createTable(Db)
 	createProduct(Db)
 }
@@ -32,4 +36,17 @@ func createProduct(db *sql.DB) {
 		log.Fatal(err.Error())
 	}
 	stmt.Exec()
+}
+
+func TestProductDb_Get(t *testing.T) {
+	setup()
+	defer Db.Close()
+	productDb := db.NewProductDb(Db)
+
+	product, err := productDb.Get("abc")
+
+	require.Nil(t, err)
+	require.Equal(t, "Product test", product.GetName())
+	require.Equal(t, 0.0, product.GetPrice())
+	require.Equal(t, "disabled", product.GetStatus())
 }
