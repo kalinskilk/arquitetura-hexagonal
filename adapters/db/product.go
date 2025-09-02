@@ -18,7 +18,7 @@ func NewProductDb(db *sql.DB) *ProductDb {
 
 func (p *ProductDb) Get(id string) (application.ProductInterface, error) {
 	var product application.Product
-	stmt, err := p.db.Prepare("select id, name, price, status from producs where id=?")
+	stmt, err := p.db.Prepare("select id, name, price, status from products where id=?")
 	if err != nil {
 		return nil, err
 	}
