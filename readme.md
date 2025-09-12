@@ -8,6 +8,6 @@ go test ./...
 
 # Criar tabela via sqlite3
 
-sqlite3 sqlite.db
+sqlite3 db.sqlite
 
 create table products(id string,name string,price float, status string);
