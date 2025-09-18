@@ -11,14 +11,18 @@ type Product struct{
 	Status string `json:"status"`
 }
 
+func NewProduct()*Product{
+	return &Product{}
+}
+
 func (p *Product) Bind(product *application.Product)(*application.Product,error){
-	if p.id != ""{
-		product.ID = p.ID
+	if p.ID != ""{
+		product.Id = p.ID
 	}
 	product.Name = p.Name
 	product.Price = p.Price
 	product.Status = p.Status
-	_, err := product.isValid()
+	_, err := product.IsValid()
 	if err !=nil{
 		return &application.Product{},err
 	}
