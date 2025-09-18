@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/kalinskilk/arquitetura-hexagonal/application"
+	"github.com/kalinskilk/arquitetura-hexagonal/adapters/web/handler"
 	"log"
 	"net/http"
 	"os"
@@ -20,28 +21,27 @@ func MakeNewWebServer() *WebServer {
 }
 
 func (w WebServer) Serve() {
-	r := mux.NewRouter()
+    r := mux.NewRouter()
 
-	n := negroni.New(
-		negroni.NewLogger(),
-	)
+    n := negroni.New(
+        negroni.NewLogger(),
+    )
 
-	n.UseHandler(r)
+    // registra apenas as rotas no router
+    handler.MakeProductHandlers(r, w.Service)
 
-	handler.MakeProductHandlers(r,n,w.Service)
-	
-	http.Handle("/",r)
+    // define router como handler do Negroni
+    n.UseHandler(r)
 
-	server := &http.Server{
-		ReadHeaderTimeout: 10 * time.Second,
-		WriteTimeout:      10 * time.Second,
-		Addr:              ":8080",
-		Handler:           n,
-		ErrorLog:          log.New(os.Stderr, "log: ", log.Lshortfile),
-	}
+    server := &http.Server{
+        ReadHeaderTimeout: 10 * time.Second,
+        WriteTimeout:      10 * time.Second,
+        Addr:              ":9000",
+        Handler:           n,
+        ErrorLog:          log.New(os.Stderr, "log: ", log.Lshortfile),
+    }
 
-	err := server.ListenAndServe()
-	if err != nil {
-		log.Fatal(err)
-	}
+    if err := server.ListenAndServe(); err != nil {
+        log.Fatal(err)
+    }
 }

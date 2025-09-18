@@ -4,15 +4,14 @@ package handler
 import (
 	"net/http"
 	"encoding/json"
-	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 
 	"github.com/kalinskilk/arquitetura-hexagonal/application"
 )
 
-func MakeProductHandlers(r *mux.Router, n *negroni.Negroni, service application.ProductServiceInterface){
-	r.Handle("/product/{id}",	n.With(negroni.Wrap(getProduct(service)))).Methods("GET","OPTIONS")
-}		
+func MakeProductHandlers(r *mux.Router, service application.ProductServiceInterface) {
+    r.Handle("/product/{id}", getProduct(service)).Methods("GET", "OPTIONS")
+}
 
 func getProduct(service application.ProductServiceInterface) http.Handler{
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
