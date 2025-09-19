@@ -13,6 +13,8 @@ import (
 func MakeProductHandlers(r *mux.Router, service application.ProductServiceInterface) {
     r.Handle("/product/{id}", getProduct(service)).Methods("GET", "OPTIONS")
     r.Handle("/product", createProduct(service)).Methods("POST", "OPTIONS")
+    r.Handle("/product/{id}/enable", enableProduct(service)).Methods("GET", "OPTIONS")
+    r.Handle("/product/{id}/disable", disableProduct(service)).Methods("GET", "OPTIONS")
 }
 
 func getProduct(service application.ProductServiceInterface) http.Handler{
@@ -57,6 +59,56 @@ func createProduct(service application.ProductServiceInterface) http.Handler{
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write(jsonError(err.Error()))
 			return 
+		}
+	})
+}
+
+func enableProduct(service application.ProductServiceInterface) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		w.Header().Set("Content-type","application/json")
+		vars := mux.Vars(r)
+		id:= vars["id"]
+
+		product, err := service.Get(id)
+		if err !=nil{
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		result, err := service.Enable(product)
+		if err !=nil{
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		err = json.NewEncoder(w).Encode(result)
+		if err !=nil{
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+func disableProduct(service application.ProductServiceInterface) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		w.Header().Set("Content-type","application/json")
+		vars := mux.Vars(r)
+		id:= vars["id"]
+
+		product, err := service.Get(id)
+		if err !=nil{
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		result, err := service.Disable(product)
+		if err !=nil{
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(jsonError(err.Error()))
+			return
+		}
+		err = json.NewEncoder(w).Encode(result)
+		if err !=nil{
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	})
 }
